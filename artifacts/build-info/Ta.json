@@ -1,0 +1,462 @@
+{
+    "compiler": {
+      "version": "0.8.24+commit.e11b9ed9"
+    },
+    "language": "Solidity",
+    "output": {
+      "abi": [
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "_initialOwner",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_opinionMaker",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "constructor"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "owner",
+              "type": "address"
+            }
+          ],
+          "name": "OwnableInvalidOwner",
+          "type": "error"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            }
+          ],
+          "name": "OwnableUnauthorizedAccount",
+          "type": "error"
+        },
+        {
+          "inputs": [],
+          "name": "expmod_Error",
+          "type": "error"
+        },
+        {
+          "inputs": [],
+          "name": "k256Decompress_Invalid_Length_Error",
+          "type": "error"
+        },
+        {
+          "inputs": [],
+          "name": "k256DeriveY_Invalid_Prefix_Error",
+          "type": "error"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "previousOwner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "OwnershipTransferred",
+          "type": "event"
+        },
+        {
+          "inputs": [],
+          "name": "generateKey",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "kernelId",
+              "type": "uint256"
+            }
+          ],
+          "name": "getOpinion",
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            },
+            {
+              "internalType": "bytes",
+              "name": "",
+              "type": "bytes"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "string",
+              "name": "password",
+              "type": "string"
+            }
+          ],
+          "name": "getSigningKeypairPrivateKey",
+          "outputs": [
+            {
+              "internalType": "bytes",
+              "name": "",
+              "type": "bytes"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "getSigningKeypairPublicKey",
+          "outputs": [
+            {
+              "internalType": "bytes",
+              "name": "",
+              "type": "bytes"
+            },
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "kernelId",
+              "type": "uint256"
+            }
+          ],
+          "name": "isKernelAllowed",
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "owner",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "renounceOwnership",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "kernelId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bool",
+              "name": "isAllowed",
+              "type": "bool"
+            }
+          ],
+          "name": "setKernel",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "newOpinionMaker",
+              "type": "address"
+            }
+          ],
+          "name": "setOpinionMaker",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "bytes32",
+              "name": "runtimeDigest",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "bool",
+              "name": "isAllowed",
+              "type": "bool"
+            }
+          ],
+          "name": "setRuntimeDigest",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "bytes",
+              "name": "pubKey",
+              "type": "bytes"
+            },
+            {
+              "internalType": "bytes",
+              "name": "privKey",
+              "type": "bytes"
+            }
+          ],
+          "name": "setSigningKeypair",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "string",
+              "name": "password",
+              "type": "string"
+            }
+          ],
+          "name": "setSigningKeypairRetrievalPassword",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "kernelNodePubKey",
+              "type": "address"
+            },
+            {
+              "internalType": "bool",
+              "name": "isAllowed",
+              "type": "bool"
+            }
+          ],
+          "name": "setWhitelist",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "senderAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "bytes",
+              "name": "",
+              "type": "bytes"
+            },
+            {
+              "internalType": "bytes",
+              "name": "functionParams",
+              "type": "bytes"
+            },
+            {
+              "internalType": "bytes",
+              "name": "kernelParamObjects",
+              "type": "bytes"
+            },
+            {
+              "internalType": "bytes",
+              "name": "kernelResponses",
+              "type": "bytes"
+            }
+          ],
+          "name": "sign",
+          "outputs": [
+            {
+              "internalType": "bytes",
+              "name": "",
+              "type": "bytes"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "bytes",
+              "name": "",
+              "type": "bytes"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "",
+              "type": "bytes32"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "transferOwnership",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        }
+      ],
+      "devdoc": {
+        "errors": {
+          "OwnableInvalidOwner(address)": [
+            {
+              "details": "The owner is not a valid owner account. (eg. `address(0)`)"
+            }
+          ],
+          "OwnableUnauthorizedAccount(address)": [
+            {
+              "details": "The caller account is not authorized to perform an operation."
+            }
+          ]
+        },
+        "kind": "dev",
+        "methods": {
+          "owner()": {
+            "details": "Returns the address of the current owner."
+          },
+          "renounceOwnership()": {
+            "details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby disabling any functionality that is only available to the owner."
+          },
+          "transferOwnership(address)": {
+            "details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
+          }
+        },
+        "version": 1
+      },
+      "userdoc": {
+        "kind": "user",
+        "methods": {
+  
+        },
+        "version": 1
+      }
+    },
+    "settings": {
+      "compilationTarget": {
+        "smart-contracts/remix-ide/contracts/CustomTokenAuthority.sol": "CustomTokenAuthority"
+      },
+      "evmVersion": "shanghai",
+      "libraries": {
+  
+      },
+      "metadata": {
+        "bytecodeHash": "ipfs"
+      },
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "remappings": [],
+      "viaIR": true
+    },
+    "sources": {
+      "@oasisprotocol/sapphire-contracts/contracts/EthereumUtils.sol": {
+        "keccak256": "0x79e34844793f4a8970d31eb4cbdd91e060fb93da4cbd28b7b8aad5c22e1f6666",
+        "license": "Apache-2.0",
+        "urls": [
+          "bzz-raw://f40fdf3c56b34ded8ba2e810e9464eafdd184a29031c5322cb8ff33ca0f4a8ef",
+          "dweb:/ipfs/QmRC1fBpi7yETwN2ZxeDf1ZBgtwRiHWzQ1DYfUJ2jxWkok"
+        ]
+      },
+      "@oasisprotocol/sapphire-contracts/contracts/Sapphire.sol": {
+        "keccak256": "0x81a0aa5766f7c48ea799114f44e902b2eb11f21808db23d56b6ca9edd48b8f59",
+        "license": "Apache-2.0",
+        "urls": [
+          "bzz-raw://a94bd0c5263e98788d38bf7b6c24781dac3df4d5cb14045f70d14e208719c292",
+          "dweb:/ipfs/QmZKEwnG9a9uPbgWCPVcbW7WGTy53Su6P1DTV95goPs4yU"
+        ]
+      },
+      "@openzeppelin/contracts/access/Ownable.sol": {
+        "keccak256": "0xff6d0bb2e285473e5311d9d3caacb525ae3538a80758c10649a4d61029b017bb",
+        "license": "MIT",
+        "urls": [
+          "bzz-raw://8ed324d3920bb545059d66ab97d43e43ee85fd3bd52e03e401f020afb0b120f6",
+          "dweb:/ipfs/QmfEckWLmZkDDcoWrkEvMWhms66xwTLff9DDhegYpvHo1a"
+        ]
+      },
+      "@openzeppelin/contracts/utils/Context.sol": {
+        "keccak256": "0x493033a8d1b176a037b2cc6a04dad01a5c157722049bbecf632ca876224dd4b2",
+        "license": "MIT",
+        "urls": [
+          "bzz-raw://6a708e8a5bdb1011c2c381c9a5cfd8a9a956d7d0a9dc1bd8bcdaf52f76ef2f12",
+          "dweb:/ipfs/Qmax9WHBnVsZP46ZxEMNRQpLQnrdE4dK8LehML1Py8FowF"
+        ]
+      },
+      "@openzeppelin/contracts/utils/cryptography/ECDSA.sol": {
+        "keccak256": "0x69f54c02b7d81d505910ec198c11ed4c6a728418a868b906b4a0cf29946fda84",
+        "license": "MIT",
+        "urls": [
+          "bzz-raw://8e25e4bdb7ae1f21d23bfee996e22736fc0ab44cfabedac82a757b1edc5623b9",
+          "dweb:/ipfs/QmQdWQvB6JCP9ZMbzi8EvQ1PTETqkcTWrbcVurS7DKpa5n"
+        ]
+      },
+      "smart-contracts/remix-ide/contracts/CustomTokenAuthority.sol": {
+        "keccak256": "0x47fa0937ffec15b879427ad8900947667509b98435609e7e5315f556cb6c7a34",
+        "license": "MIT",
+        "urls": [
+          "bzz-raw://6a321f677ad18c7cfe895e1c2a0c72b3631cf3e54dd9543118aeafd06bcaba20",
+          "dweb:/ipfs/QmUUoMTPi9eJh1XAVrDMDHu4Dh7ys9kjc7qAUf1e1uiaUt"
+        ]
+      }
+    },
+    "version": 1
+  }
