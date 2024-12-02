@@ -5,25 +5,32 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import {KrnlRegistered, KrnlPayload} from "./KrnlRegistered.sol"; // Import KRNL Protocol
 
+interface ICustomOpinionMaker {
+    function getOpinion(
+        bytes calldata executionPlan,
+        uint kernelId
+    ) external view returns (bool opinion, bool isFinalized, bytes memory updatedPlan);
+}
+
 contract KRNLTestToken is ERC20, Ownable, KrnlRegistered {
     mapping(address => bool) public whitelist_;
     mapping(address => bool) public claimed;
     bool public distributionStarted_;
+    address private customOpinionMaker;
 
     event Whitelisted(address indexed _address);
     event TokensClaimed(address indexed _address, uint256 amount);
     event DistributionStarted();
     event DistributionStopped();
 
-    // Specify custom decimals here
     uint8 private constant CUSTOM_DECIMALS = 0;
 
-    // Constructor to initialize the KRNL protocol with token authority public key
-    constructor(address _tokenAuthorityPublicKey) 
+    constructor(address _tokenAuthorityPublicKey, address _customOpinionMaker) 
         ERC20("KRNL Test Token", "KRNL")
         KrnlRegistered(_tokenAuthorityPublicKey) // Pass the token authority public key correctly as address
     {
-        _mint(msg.sender, 1000000); // Mint the total supply to the contract owner
+        _mint(msg.sender, 1000000); // Mint total supply to the contract owner
+        customOpinionMaker = _customOpinionMaker; // Set CustomOpinionMaker address
     }
 
     function decimals() public view virtual override returns (uint8) {
@@ -56,20 +63,39 @@ contract KRNLTestToken is ERC20, Ownable, KrnlRegistered {
         emit DistributionStopped();
     }
 
-    // Claim tokens with KRNL Protocol authorization check
+    // Claim tokens with opinion-based validation
     function claimTokens(
-        bytes calldata params, 
-        KrnlPayload calldata krnlPayload // Ensure KrnlPayload is calldata
+        bytes calldata params,
+        KrnlPayload calldata krnlPayload,
+        bytes calldata executionPlan,
+        uint kernelId
     ) 
         public 
-        onlyAuthorized(krnlPayload, params) // Ensure the modifier matches the types
+        onlyAuthorized(krnlPayload, params) 
     {
         require(distributionStarted_, "Distribution not started");
         require(whitelist_[msg.sender], "Not on whitelist");
         require(!claimed[msg.sender], "Tokens already claimed");
 
+        // Integrate CustomOpinionMaker logic
+        (bool opinion, bool isFinalized, bytes memory updatedPlan) = ICustomOpinionMaker(customOpinionMaker)
+            .getOpinion(executionPlan, kernelId);
+
+        require(opinion, "Opinion validation failed");
+        require(isFinalized, "Execution not finalized");
+
         claimed[msg.sender] = true;
-        _transfer(owner(), msg.sender, 1000); // Transfer 1000 tokens to the caller
+        _transfer(owner(), msg.sender, 1000); // Transfer tokens to the claimant
         emit TokensClaimed(msg.sender, 1000);
+    }
+
+    // Update the address of the CustomOpinionMaker contract (only by owner)
+    function setCustomOpinionMaker(address _customOpinionMaker) external onlyOwner {
+        customOpinionMaker = _customOpinionMaker;
+    }
+
+    // Get the address of the current CustomOpinionMaker contract
+    function getCustomOpinionMaker() external view returns (address) {
+        return customOpinionMaker;
     }
 }

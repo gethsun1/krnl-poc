@@ -1,14 +1,13 @@
 import React, { useState } from "react";
-import { ethers } from "ethers"; // Correct import for Ethers.js
+import { BrowserProvider, Contract } from "ethers"; 
 import Web3Modal from "web3modal";
 import Header from "./components/Header";
 import AdminPanel from "./components/AdminPanel";
 import UserPanel from "./components/UserPanel";
+import abi from "./abi.json"; 
 import "./css/styles.css";
 
-// ABI and contract address
-const contractABI = [ /* Your contract's ABI here */ ];
-const contractAddress = "0xYourContractAddress";
+const contractAddress = "0x28ffd222188426a9583d890fc0bbf95e5b3f81b1";
 
 function App() {
   const [provider, setProvider] = useState(null);
@@ -21,22 +20,26 @@ function App() {
     try {
       const web3Modal = new Web3Modal();
       const instance = await web3Modal.connect();
-      const tempProvider = new ethers.BrowserProvider(instance); // Updated provider reference
-      const tempSigner = await tempProvider.getSigner();
-      const tempContract = new ethers.Contract(contractAddress, contractABI, tempSigner);
 
+      // Create provider and signer using ethers 6.x
+      const tempProvider = new BrowserProvider(instance);
+      const tempSigner = await tempProvider.getSigner();
+      const tempContract = new Contract(contractAddress, abi, tempSigner);
+
+      // Save to state
       setProvider(tempProvider);
       setSigner(tempSigner);
       setContract(tempContract);
 
-      const user = await tempSigner.getAddress();
+      // Fetch and set user address
+      const user = await tempSigner.address; 
       setUserAddress(user);
 
-      // Check if user is the contract owner
+      // Fetch and set ownership status
       const owner = await tempContract.owner();
       setIsOwner(owner.toLowerCase() === user.toLowerCase());
     } catch (error) {
-      console.error("Error connecting wallet:", error);
+      console.error("Error connecting wallet:", error.message || error);
     }
   };
 

@@ -15,13 +15,13 @@ async function main() {
 
 
   // OPINION MAKER
-  console.log("START DEPLOYING CUSTOM OPINION MAKER")
+  console.log("START CUSTOM DEPLOYING OPINION MAKER")
   const providerOpinionMaker = new ethers.JsonRpcProvider(`https://testnet.sapphire.oasis.io`);
   const walletOpinionMaker = new ethers.Wallet(`${process.env.PRIVATE_KEY_OASIS}`, providerOpinionMaker);
   const ContractOpinionMaker = await ethers.getContractFactory("CustomOpinionMaker", walletOpinionMaker);
   const contractOpinionMaker = await ContractOpinionMaker.deploy(ownerAddress);
 
-  console.log("DEPLOYED OPINION MAKER")
+  console.log("DEPLOYED CUSTOM  OPINION MAKER")
   const addressOpinionMaker = contractOpinionMaker.target;
   console.log("Contract deployed to:", addressOpinionMaker);
   //   console.log("Contract: ", contractOpinionMaker)
@@ -37,7 +37,7 @@ async function main() {
   const ContractTokenAuthority = await ethers.getContractFactory("CustomTokenAuthority", walletTokenAuthority);
   const contractTokenAuthority = await ContractTokenAuthority.deploy(ownerAddress, addressOpinionMaker);
 
-  console.log("DEPLOYED TOKEN AUTHORITY")
+  console.log("DEPLOYED CUSTOM TOKEN AUTHORITY")
   const addressTokenAuthority = contractTokenAuthority.target;
   console.log("Contract deployed to:", addressTokenAuthority);
   //   console.log("Contract: ", contractTokenAuthority)
@@ -50,22 +50,9 @@ async function main() {
 
 
 
-  // KRNL REGISTERED SMART CONTRACT
-  console.log("START DEPLOYING KRNL REGISTERED SMART CONTRACT")
-  const providerMain = new ethers.JsonRpcProvider(`https://sepolia.infura.io/v3/${process.env.INFURA_PROJECT_ID}`);
-  const walletMain = new ethers.Wallet(`${process.env.PRIVATE_KEY_SEPOLIA}`, providerMain);
-
-  const ContractMain = await ethers.getContractFactory("KRNLTestToken", walletMain);
-  const contractMain = await ContractMain.deploy(TAPublicKeyAddress);
-  console.log("DEPLOYED KRNL REGISTERED SMART CONTRACT")
-  const addressMain = contractMain.target;
-  console.log("Contract deployed to:", addressMain);
-  //   console.log("Contract: ", contractMain)
-
   console.log("=====SUMMARY=====")
   console.log("Opinion Maker - Oasis Sapphire testnet\nAddress:", addressOpinionMaker)
   console.log("\nToken Authority - Oasis Sapphire testnet\nAddress:", addressTokenAuthority)
-  console.log("\nKRNL Registered Smart Contract - Sepolia\nAddress:", addressMain)
   console.log("=================")
 }
 

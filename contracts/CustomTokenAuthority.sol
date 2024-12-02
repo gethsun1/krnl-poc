@@ -2,11 +2,11 @@
 pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@oasisprotocol/sapphire-contracts/contracts/Sapphire.sol";
 import "@oasisprotocol/sapphire-contracts/contracts/EthereumUtils.sol";
 
-    // Constructor to set initial owner and initialize keys
 contract CustomTokenAuthority is Ownable {
     struct Keypair {
         bytes pubKey;
@@ -14,7 +14,7 @@ contract CustomTokenAuthority is Ownable {
     }
 
     struct Execution {
-        uint256 kernelId;
+        uint kernelId;
         bytes result;
         bytes proof;
         bool isValidated;
@@ -25,132 +25,107 @@ contract CustomTokenAuthority is Ownable {
     bytes32 private signingKeypairRetrievalPassword;
     address private opinionMaker;
 
-    mapping(address => bool) private whitelist;
-    mapping(bytes32 => bool) private runtimeDigests;
-    mapping(uint256 => bool) private allowedKernels;
+    mapping(address => bool) private whitelist; // Whitelisted addresses
+    mapping(bytes32 => bool) private runtimeDigests; // Runtime digests
+    mapping(uint => bool) private kernels; // Allowed kernel IDs
 
-    constructor(address _initialOwner, address _opinionMaker) Ownable(_initialOwner) {
-        require(_initialOwner != address(0), "Owner address cannot be zero");
-        require(_opinionMaker != address(0), "Opinion maker address cannot be zero");
+    constructor(address initialOwner, address _opinionMaker) Ownable(initialOwner) {
+        signingKeypair = _generateKey();
+        accessKeypair = _generateKey();
         opinionMaker = _opinionMaker;
     }
 
+    modifier onlyAuthorized(bytes calldata auth) {
+        (bytes32 entryId, bytes memory accessToken, bytes32 runtimeDigest, bytes memory runtimeDigestSignature) = abi.decode(auth, (bytes32, bytes, bytes32, bytes));
+        require(_verifyAccessToken(entryId, accessToken), "Unauthorized: Invalid access token");
+        _;
+    }
 
-    // Keypair generation function
-    function generateKey() external onlyOwner {
+    modifier onlyValidated(bytes calldata executionPlan) {
+        require(_verifyExecutionPlan(executionPlan), "Invalid execution plan");
+        _;
+    }
+
+    modifier onlyAllowedKernel(uint kernelId) {
+        require(kernels[kernelId], "Kernel not allowed");
+        _;
+    }
+
+    function _generateKey() private view returns (Keypair memory) {
         bytes memory seed = Sapphire.randomBytes(32, "");
-        (bytes memory pubKey, bytes memory privKey) = Sapphire.generateSigningKeyPair(
-            Sapphire.SigningAlg.Secp256k1PrehashedKeccak256,
-            seed
-        );
-        signingKeypair = Keypair(pubKey, privKey);
-        accessKeypair = Keypair(pubKey, privKey); // Example - update appropriately
+        (bytes memory pubKey, bytes memory privKey) = Sapphire.generateSigningKeyPair(Sapphire.SigningAlg.Secp256k1PrehashedKeccak256, seed);
+        return Keypair(pubKey, privKey);
     }
 
-    // Updates the opinion maker address
-    function setOpinionMaker(address newOpinionMaker) external onlyOwner {
-        require(newOpinionMaker != address(0), "Invalid opinion maker address");
-        opinionMaker = newOpinionMaker;
+    function _verifyAccessToken(bytes32 entryId, bytes memory accessToken) private view returns (bool) {
+        bytes memory digest = abi.encodePacked(keccak256(abi.encode(entryId)));
+        return Sapphire.verify(Sapphire.SigningAlg.Secp256k1PrehashedKeccak256, accessKeypair.pubKey, digest, "", accessToken);
     }
 
-    // Allows the owner to update the signing keypair
+    function _verifyRuntimeDigest(bytes32 runtimeDigest, bytes memory runtimeDigestSignature) private view returns (bool) {
+        bytes32 digest = MessageHashUtils.toEthSignedMessageHash(runtimeDigest);
+        address recoveredPubKey = ECDSA.recover(digest, runtimeDigestSignature);
+        return whitelist[recoveredPubKey];
+    }
+
+    function _verifyExecutionPlan(bytes calldata executionPlan) private pure returns (bool) {
+        Execution[] memory executions = abi.decode(executionPlan, (Execution[]));
+        for (uint i = 0; i < executions.length; i++) {
+            if (!executions[i].isValidated) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function setOpinionMaker(address _opinionMaker) external onlyOwner {
+        opinionMaker = _opinionMaker;
+    }
+
     function setSigningKeypair(bytes calldata pubKey, bytes calldata privKey) external onlyOwner {
         signingKeypair = Keypair(pubKey, privKey);
     }
 
-    // Sets a password for retrieving the private signing key
-    function setSigningKeypairRetrievalPassword(string calldata password) external onlyOwner {
-        signingKeypairRetrievalPassword = keccak256(abi.encodePacked(password));
+    function setSigningKeypairRetrievalPassword(string calldata _password) external onlyOwner {
+        signingKeypairRetrievalPassword = keccak256(abi.encodePacked(_password));
     }
 
-    // Returns the public key and its derived Ethereum address
     function getSigningKeypairPublicKey() external view returns (bytes memory, address) {
         address signingKeypairAddress = EthereumUtils.k256PubkeyToEthereumAddress(signingKeypair.pubKey);
         return (signingKeypair.pubKey, signingKeypairAddress);
     }
 
-    // Returns the private key if the correct password is provided
-    function getSigningKeypairPrivateKey(string calldata password) external view onlyOwner returns (bytes memory) {
-        require(
-            signingKeypairRetrievalPassword == keccak256(abi.encodePacked(password)),
-            "Invalid password"
-        );
+    function getSigningKeypairPrivateKey(string calldata _password) external view onlyOwner returns (bytes memory) {
+        require(signingKeypairRetrievalPassword == keccak256(abi.encodePacked(_password)), "Invalid password");
         return signingKeypair.privKey;
     }
 
-    // Adds or removes a kernel node from the whitelist
-    function setWhitelist(address kernelNodePubKey, bool isAllowed) external onlyOwner {
-        whitelist[kernelNodePubKey] = isAllowed;
+    function setWhitelist(address krnlNodePubKey, bool allowed) external onlyOwner {
+        whitelist[krnlNodePubKey] = allowed;
     }
 
-    // Updates the runtime digest state
-    function setRuntimeDigest(bytes32 runtimeDigest, bool isAllowed) external onlyOwner {
-        runtimeDigests[runtimeDigest] = isAllowed;
+    function setRuntimeDigest(bytes32 runtimeDigest, bool allowed) external onlyOwner {
+        runtimeDigests[runtimeDigest] = allowed;
     }
 
-    // Adds or removes an allowed kernel
-    function setKernel(uint256 kernelId, bool isAllowed) external onlyOwner {
-        allowedKernels[kernelId] = isAllowed;
+    function setKernel(uint kernelId, bool allowed) external onlyOwner {
+        kernels[kernelId] = allowed;
     }
 
-    // Checks if a kernel is allowed (no modifier needed)
-    function isKernelAllowed(uint256 kernelId) external view returns (bool) {
-            return allowedKernels[kernelId];
-    }
-    modifier onlyAllowedKernel(uint256 kernelId) {
-        require(allowedKernels[kernelId], "Kernel is not allowed");
-        _;
+    function registerdApp(bytes32 entryId) external view returns (bytes memory) {
+        bytes memory digest = abi.encodePacked(keccak256(abi.encode(entryId)));
+        return Sapphire.sign(Sapphire.SigningAlg.Secp256k1PrehashedKeccak256, accessKeypair.privKey, digest, "");
     }
 
-    // Retrieves an opinion for a given kernel ID
- function getOpinion(uint256 kernelId)
-    external
-    view
-    onlyAllowedKernel(kernelId)
-    returns (bool, bool, bytes memory)
-{
-    (bool success, bytes memory data) = opinionMaker.staticcall(
-        abi.encodeWithSignature("getOpinion(uint256)", kernelId)
-    );
-    require(success, "Opinion retrieval failed");
+    function isKernelAllowed(bytes calldata auth, uint kernelId) external view onlyAuthorized(auth) returns (bool) {
+        return kernels[kernelId];
+    }
 
-    (bool opinion, bool isFinalized, bytes memory updatedPlan) = abi.decode(data, (bool, bool, bytes));
-    return (opinion, isFinalized, updatedPlan);
-}
-
-
-    // Signs kernel-related data and returns the results
-    function sign(
-        address senderAddress,
-        bytes calldata /* executionPlan */,
-        bytes calldata functionParams,
-        bytes calldata kernelParamObjects,
-        bytes calldata kernelResponses
-    ) external view returns (bytes memory, bytes32, bytes memory, bytes32) {
-        bytes32 functionParamsDigest = keccak256(abi.encode(functionParams));
-        bytes32 kernelParamObjectsDigest = kernelParamObjects.length > 0
-            ? keccak256(abi.encode(kernelParamObjects))
-            : bytes32(0);
-        bytes32 dataDigest = keccak256(
-            abi.encode(functionParamsDigest, kernelParamObjectsDigest, senderAddress)
-        );
-        bytes32 kernelResponsesDigest = keccak256(abi.encode(kernelResponses, senderAddress));
-
-        bytes memory kernelResponsesSignature = Sapphire.sign(
-            Sapphire.SigningAlg.Secp256k1PrehashedKeccak256,
-            abi.encodePacked(signingKeypair.privKey),
-            abi.encode(kernelResponsesDigest),
-            ""
-        );
-
-        bytes32 nonce = bytes32(Sapphire.randomBytes(32, ""));
-        bytes memory signatureToken = Sapphire.sign(
-            Sapphire.SigningAlg.Secp256k1PrehashedKeccak256,
-            abi.encodePacked(signingKeypair.privKey),
-            abi.encode(dataDigest, nonce),
-            ""
-        );
-
-        return (kernelResponsesSignature, kernelResponsesDigest, signatureToken, nonce);
+    function getOpinion(bytes calldata auth, bytes calldata executionPlan, uint kernelId)
+        external view onlyAuthorized(auth) returns (bool, bool, bytes memory)
+    {
+        (bool success, bytes memory data) = opinionMaker.staticcall(abi.encodeWithSignature("getOpinion(bytes,uint256)", executionPlan, kernelId));
+        require(success, "Opinion retrieval failed");
+        return abi.decode(data, (bool, bool, bytes));
     }
 }

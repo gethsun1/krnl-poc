@@ -8,13 +8,13 @@ dotenv.config();
 
 const config: HardhatUserConfig = {
   solidity: {
-    version: "0.8.24", // Oasis supports up to 0.8.24
+    version: "0.8.24", 
     settings: {
       optimizer: {
         enabled: true,
         runs: 200,
       },
-      viaIR: true // set to true for TA
+      viaIR: true 
     }
   },
   networks: {
@@ -26,8 +26,12 @@ const config: HardhatUserConfig = {
       url: `https://testnet.sapphire.oasis.io`,
       chainId: 23295,
       accounts: [`0x${process.env.PRIVATE_KEY_OASIS}`],
-    }
-   
+    },
+    'devnet': {
+      url: `${process.env.DEVNET_RPC}`,
+      chainId: 14121,
+      accounts: [`0x${process.env.PRIVATE_KEY_DEVNET}`],
+    },
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY
