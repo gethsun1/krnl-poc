@@ -4,7 +4,7 @@
 
 ---
 
-Welcome to the KRNL Proof of Concept (PoC) DApp repository! This project demonstrates the KRNL protocol's functionality and showcases the processes behind customizing and interacting with KRNL tokens, including setting up the **Custom Opinion Maker**, managing the **Custom Token Authority**, and upgrading **KrnlTestToken** for registration to **Kenrnels** within the KRNL ecosystem.
+Welcome to the KRNL Proof of Concept (PoC) DApp repository! This project demonstrates the KRNL protocol's functionality and showcases the processes behind customizing and interacting with KRNL tokens, including setting up the **Custom Opinion Maker**, managing the **Custom Token Authority**, and upgrading **KrnlTestToken** for registration to **Kernels** within the KRNL ecosystem.
 
 This readme will guide you through the key processes for setting up and using the KRNL DApp.
 
@@ -24,7 +24,7 @@ This readme will guide you through the key processes for setting up and using th
 
 ## Project Overview
 
-The KRNL DApp is designed to work with the **KRNL Protocol**, which allows users to interact with **Kenrnels**, a decentralized platform for registering custom tokens. This PoC demonstrates the core functionality, including token management, adding tokens to whitelists, claiming tokens, and initiating distribution.
+The KRNL DApp is designed to work with the **KRNL Protocol**, which allows users to interact with **Kernels**, a decentralized platform for registering custom tokens. This PoC demonstrates the core functionality, including token management, adding tokens to whitelists, claiming tokens, and initiating distribution.
 
 The key components in the project are:
 - **Custom Opinion Maker**: A decentralized mechanism that allows users to express opinions and vote on token-related decisions.
