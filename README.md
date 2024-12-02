@@ -49,7 +49,7 @@ git clone https://github.com/gethsun1/krnl-poc.git
 cd krnl-poc
 
 
-# KRNL PoC DApp Setup
+### KRNL PoC DApp Setup
 
 ## Setting Up the Development Environment
 
@@ -58,7 +58,7 @@ cd krnl-poc
 The project uses React for the frontend and ethers.js for interacting with Ethereum-based smart contracts.  
 Run the following command to install dependencies:
 
-```bash
+```
 npm install
 
 ## Set Up Web3Modal:
