@@ -164,9 +164,12 @@ Once the KrnlTestToken is deployed and tested, it can be upgraded for registrati
 1. Deploy the KrnlTestToken:
 The KrnlTestToken contract should initially be deployed to a test network for thorough testing. It can be based on the ERC-20 standard and include functions for token transfer, minting, and claiming.
 
-2. Register KrnlTestToken with Kenrnels:
-To upgrade the token for registration in Kenrnels, we need to make sure that the token meets the necessary requirements.
+2. Register KrnlTestToken with Kernels:
+To upgrade the token for registration in Kernels, we need to make sure that the token meets the necessary requirements.
 You will need to interact with the KenrnelsRegistry contract that manages registered tokens:
+---
+
+[![Screenshot-from-2024-12-03-01-10-02.png](https://i.postimg.cc/k5n26fzK/Screenshot-from-2024-12-03-01-10-02.png)](https://postimg.cc/9DnmstWQ)
 
 ### Interacting with the DApp
 Once everything is set up, you can interact with the DApp:
