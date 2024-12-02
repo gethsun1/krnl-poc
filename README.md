@@ -48,7 +48,30 @@ Before you begin, make sure you have the following installed:
 git clone https://github.com/gethsun1/krnl-poc.git
 cd krnl-poc
 
+
+# KRNL PoC DApp Setup
+
+## Setting Up the Development Environment
+
+### Install Dependencies:
+
+The project uses React for the frontend and ethers.js for interacting with Ethereum-based smart contracts.  
+Run the following command to install dependencies:
+
+```bash
 npm install
-# or
-yarn install
+
+## Set Up Web3Modal:
+This DApp integrates Web3Modal for connecting wallets to the application. It’s important that MetaMask or any Web3-compatible wallet is installed and configured in your browser.
+
+### Compile the Smart Contracts:
+If you're deploying or testing your own version of the contract, make sure the smart contracts are compiled and migrated correctly using Hardhat or Truffle.
+
+## Custom Opinion Maker Setup
+The Custom Opinion Maker is the foundation of decision-making within the KRNL DApp, enabling the community or users to propose opinions that can influence the ecosystem.
+
+### Deploy the Custom Opinion Maker Contract
+In your development environment, navigate to the CustomOpinionMaker.sol contract file and deploy it to your chosen test network.
+
+
 
